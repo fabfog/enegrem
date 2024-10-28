@@ -74,7 +74,7 @@ function App() {
   }, [text, enegrem])
 
   return (
-    <div className="flex flex-col gap-8 items-center justify-center container max-w-lg mx-auto mt-8">
+    <div className="flex flex-col p-4 gap-8 items-center justify-center container max-w-lg mx-auto mt-8">
       <h1 className="text-3xl font-bold text-red-400">
         ENEGREM
       </h1>
