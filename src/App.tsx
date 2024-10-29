@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react"
 import { Textarea } from "./components/ui/textarea";
 import { clsx } from "clsx";
 import Logo from './assets/logo.svg';
+import { Button } from "./components/ui/button";
+import { CheckCircledIcon, Link1Icon } from "@radix-ui/react-icons";
 
 function splitChars(text: string) {
   return text.split("").filter(c => /[a-zA-Z]/.test(c));
@@ -34,11 +36,11 @@ function App() {
     window.history.pushState(null, '', url.toString());
   }, [enegrem, text, url]);
 
-  const { diff, isComplete, textRemainingLetters } = useMemo(() => {
-    const normalizedenegrem = normalize(enegrem);
+  const { diff, isComplete, textRemainingLetters, enegremSurplusLetters } = useMemo(() => {
+    const normalizedEnegrem = normalize(enegrem);
     const normalizedText = normalize(text);
 
-    const enegremLetters = splitChars(normalizedenegrem).sort();
+    const enegremLetters = splitChars(normalizedEnegrem).sort();
     const textLetters = splitChars(normalizedText).sort();
 
     const textRemainingLetters: Array<string | null> = splitChars(normalizedText);
@@ -46,6 +48,14 @@ function App() {
       const indexOfChar = textRemainingLetters.findIndex(l => l === c);
       if (indexOfChar > -1) {
         textRemainingLetters[indexOfChar] = null;
+      }
+    })
+
+    const enegremSurplusLetters: Array<string | null> = splitChars(normalizedEnegrem);
+    textLetters.forEach(c => {
+      const indexOfChar = enegremSurplusLetters.findIndex(l => l === c);
+      if (indexOfChar > -1) {
+        enegremSurplusLetters[indexOfChar] = null;
       }
     })
 
@@ -68,6 +78,7 @@ function App() {
     return {
       enegremLetters,
       textRemainingLetters,
+      enegremSurplusLetters,
       textLetters,
       diff,
       isComplete,
@@ -95,19 +106,34 @@ function App() {
             )}
             key={letter}
           >
-            <strong>{letter}</strong> : <div className="min-w-[2ch] text-center">{value > 100 ? "99+" : value === 0 ? "✅" : value}</div>
+            <strong>{letter}</strong> : <div className="min-w-[2ch] text-center">
+              {value > 100 ? "99+" : value === 0 ? <CheckCircledIcon width={24} height={24} className="text-green-500" /> : value}
+            </div>
           </li>
         ))}
         </ul>
         {isComplete ? (
           <h2 className="text-xl font-bold text-green-500">ENEGREM COMPLETED!</h2> 
         ) : (
-          <ul className="flex flex-wrap items-center gap-1 py-[2px]">
+          <ul className="flex flex-wrap text-sm items-center gap-2 py-[2px]">
             {textRemainingLetters.map((l, i) => <li key={i}>{l === null ? "_" : l}</li>)}
+            {enegremSurplusLetters.filter(Boolean).map((l, i) => <li className="text-red-500" key={i}>{l}</li>)}
           </ul>
         )}
 
       <Textarea disabled={!text} className="text-lg min-h-40" value={enegrem} onChange={(e) => setEnegrem(e.target.value)} />
+        
+      <Button
+        variant="secondary"
+        onClick={() => {
+          navigator.clipboard.writeText(window.location.href);
+          alert("Copied!");
+        }}
+        type="button"
+      >
+        <Link1Icon />
+        Copy link to this enegrem
+      </Button>
     </div>
   )
 }
