@@ -74,17 +74,19 @@ function App() {
   }, [text, enegrem])
 
   return (
-    <div className="flex flex-col p-4 gap-8 items-center justify-center container max-w-lg mx-auto mt-8">
+    <div className="flex flex-col p-4 gap-4 items-center justify-center container max-w-lg mx-auto">
       <h1 className="text-3xl font-bold text-red-400">
         ENEGREM
       </h1>
-      <Textarea placeholder="Insert text (i.e. Codroipo)" className="text-lg min-h-24" value={text} onChange={(e) => setText(e.target.value)} />
+      <Textarea placeholder="Insert text (i.e. Codroipo)" className="text-lg min-h-40" value={text} onChange={(e) => setText(e.target.value)} />
      
-      <ul className="flex items-center gap-2 flex-wrap">
+      <ul className="grid gap-1 grid-cols-5 sm:grid-cols-6 lg:grid-cols-7">
         {Object.entries(diff).map(([letter, value]) => (
           <li
             className={clsx(
-              "border pl-3 pr-2 py-1 gap-1 rounded-full whitespace-nowrap flex items-center",
+              "border pl-2 pr-1 py-1 gap-1 min-w-16 rounded-full whitespace-nowrap",
+              "flex justify-center items-center",
+              "text-sm md:text-base",
               value === 0 && "bg-green-200 opacity-75",
               value < 0 && "bg-red-200"
             )}
@@ -102,7 +104,7 @@ function App() {
           </ul>
         )}
 
-      <Textarea disabled={!text} className="text-lg min-h-24" value={enegrem} onChange={(e) => setEnegrem(e.target.value)} />
+      <Textarea disabled={!text} className="text-lg min-h-40" value={enegrem} onChange={(e) => setEnegrem(e.target.value)} />
     </div>
   )
 }
