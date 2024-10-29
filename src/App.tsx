@@ -89,13 +89,13 @@ function App() {
             className={clsx(
               "border pl-2 pr-1 py-1 gap-1 min-w-16 rounded-full whitespace-nowrap",
               "flex justify-center items-center",
-              "text-sm md:text-base",
-              value === 0 && "bg-green-200 opacity-75",
+              "text-sm md:text-base border",
+              value === 0 && "border-green-500 bg-green-50 opacity-75",
               value < 0 && "bg-red-200"
             )}
             key={letter}
           >
-            <strong>{letter}</strong> : <div className="min-w-[2ch] text-center">{value > 100 ? "99+" : value}</div>
+            <strong>{letter}</strong> : <div className="min-w-[2ch] text-center">{value > 100 ? "99+" : value === 0 ? "✅" : value}</div>
           </li>
         ))}
         </ul>
