@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Textarea } from "./components/ui/textarea";
 import { clsx } from "clsx";
+import Logo from './assets/logo.svg';
 
 function splitChars(text: string) {
   return text.split("").filter(c => /[a-zA-Z]/.test(c));
@@ -75,8 +76,10 @@ function App() {
 
   return (
     <div className="flex flex-col p-4 gap-4 items-center justify-center container max-w-lg mx-auto">
-      <h1 className="text-3xl font-bold text-red-400">
+      <h1 className="text-3xl font-bold flex items-center gap-2 justify-between w-full">
+        <Logo />
         ENEGREM
+        <div className="invisible"><Logo /></div>
       </h1>
       <Textarea placeholder="Insert text (i.e. Codroipo)" className="text-lg min-h-40" value={text} onChange={(e) => setText(e.target.value)} />
      
