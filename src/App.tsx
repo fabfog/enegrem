@@ -3,15 +3,9 @@ import { Textarea } from "./components/ui/textarea";
 import { clsx } from "clsx";
 import Logo from './assets/logo.svg';
 import { Button } from "./components/ui/button";
-import { CheckCircledIcon, Link1Icon } from "@radix-ui/react-icons";
+import { CheckCircledIcon, Cross1Icon, Link1Icon } from "@radix-ui/react-icons";
+import { useEnegrem } from "./hooks/use-enegrem";
 
-function splitChars(text: string) {
-  return text.split("").filter(c => /[a-zA-Z]/.test(c));
-}
-
-function normalize(text:string) {
-  return text.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-}
 const textQueryParamKey = "t";
 const enegremQueryParamKey = "e";
 
@@ -36,54 +30,7 @@ function App() {
     window.history.pushState(null, '', url.toString());
   }, [enegrem, text, url]);
 
-  const { diff, isComplete, textRemainingLetters, enegremSurplusLetters } = useMemo(() => {
-    const normalizedEnegrem = normalize(enegrem);
-    const normalizedText = normalize(text);
-
-    const enegremLetters = splitChars(normalizedEnegrem).sort();
-    const textLetters = splitChars(normalizedText).sort();
-
-    const textRemainingLetters: Array<string | null> = splitChars(normalizedText);
-    enegremLetters.forEach(c => {
-      const indexOfChar = textRemainingLetters.findIndex(l => l === c);
-      if (indexOfChar > -1) {
-        textRemainingLetters[indexOfChar] = null;
-      }
-    })
-
-    const enegremSurplusLetters: Array<string | null> = splitChars(normalizedEnegrem);
-    textLetters.forEach(c => {
-      const indexOfChar = enegremSurplusLetters.findIndex(l => l === c);
-      if (indexOfChar > -1) {
-        enegremSurplusLetters[indexOfChar] = null;
-      }
-    })
-
-    const diff: Record<string, number> = {};
-    textLetters.forEach(c => {
-      if (diff[c] === undefined) {
-        diff[c] = 0;
-      } 
-      diff[c] += 1
-    });
-    enegremLetters.forEach(c => {
-      if (diff[c] === undefined) {
-        diff[c] = 0;
-      } 
-      diff[c] -= 1
-    });
-
-    const isComplete = text.length > 0 && Object.values(diff).every(v => v === 0)
-
-    return {
-      enegremLetters,
-      textRemainingLetters,
-      enegremSurplusLetters,
-      textLetters,
-      diff,
-      isComplete,
-    }
-  }, [text, enegrem])
+  const { diff, isComplete, textRemainingLetters, enegremSurplusLetters } = useEnegrem(text, enegrem)
 
   return (
     <div className="flex flex-col p-4 gap-4 items-center justify-center container max-w-lg mx-auto">
@@ -92,8 +39,14 @@ function App() {
         ENEGREM
         <div className="invisible"><Logo /></div>
       </h1>
-      <Textarea placeholder="Insert text (i.e. Codroipo)" className="text-lg min-h-40" value={text} onChange={(e) => setText(e.target.value)} />
-     
+
+      <Textarea
+        className="text-lg min-h-40"
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Insert text here (i.e. Codroipo)" 
+        value={text}
+      />
+             
       <ul className="grid gap-1 grid-cols-5 sm:grid-cols-6 lg:grid-cols-7">
         {Object.entries(diff).map(([letter, value]) => (
           <li
@@ -121,19 +74,38 @@ function App() {
           </ul>
         )}
 
-      <Textarea disabled={!text} className="text-lg min-h-40" value={enegrem} onChange={(e) => setEnegrem(e.target.value)} />
+      
+      <Textarea
+        className="text-lg min-h-40"
+        value={enegrem}
+        onChange={(e) => setEnegrem(e.target.value)}
+        placeholder="Write your enegrem here!"
+      />
         
-      <Button
-        variant="secondary"
-        onClick={() => {
-          navigator.clipboard.writeText(window.location.href);
-          alert("Copied!");
-        }}
-        type="button"
-      >
-        <Link1Icon />
-        Copy link to this enegrem
-      </Button>
+      <div className="flex items-enter gap-2">
+        <Button
+          variant="destructive"
+          onClick={() => {
+            setText("");
+            setEnegrem("");
+          }}
+        >
+          <Cross1Icon />
+          clear all
+        </Button>
+
+        <Button
+          variant="secondary"
+          onClick={() => {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Copied!");
+          }}
+          type="button"
+        >
+          <Link1Icon />
+          Copy link to this enegrem
+        </Button>
+      </div>
     </div>
   )
 }
